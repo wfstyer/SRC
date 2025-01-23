@@ -14,6 +14,9 @@
 #include <conio.h>
 #include <iostream>
 #include <time.h> 
+
+//#include <afxwin.h>
+
 #include "../LIB/MiAPI.h"
 
 // Alternatively add the following pragma comment, instead of setting up referrence dependence 
@@ -121,6 +124,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	ret = Do_MiAPI_Version();
 	printf("--------------------------------------------------------------\n");
 
+//	AfxMessageBox(_T("Simple message box."));
+
 	// Add a timer
 	{
 		MSG Msg;
@@ -131,10 +136,14 @@ int _tmain(int argc, _TCHAR* argv[])
 		{
 			TranslateMessage(&Msg);
 			DispatchMessage(&Msg);
-			//if (Msg.message == WM_KEYDOWN)
-			//	break;
+
+			if (kbhit())
+			{
+				MiAPI_Exit();
+				break;
+			}
 		}
-		return 0;
+		return Msg.wParam;
 	}
 
 	//-- Handle MiAPI　functions
