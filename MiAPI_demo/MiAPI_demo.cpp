@@ -15,9 +15,34 @@
 #include <iostream>
 #include <time.h> 
 
-//#include <afxwin.h>
+#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+#include <stdlib.h>
+#include <sal.h>
+#include <tchar.h>
+
+//#include "mysql_connection.h" 
 
 #include "../LIB/MiAPI.h"
+//#include "../../../../../../../Windows/Microsoft.NET/Framework/v4.0.30319/System.Data.dll"
+
+//#using < mscorlib.dll>
+//#using < System.dll>
+//#using < System.Data.dll>
+//#using < System.Xml.dll>
+//
+//using namespace System;
+//using namespace System::Data;
+//using namespace System::Data::SqlClient;
+
+using namespace std;
+
+
+
+
+
+
 
 // Alternatively add the following pragma comment, instead of setting up referrence dependence 
 // in compiler environment setting. Be aware to put the same bits version MiAPI.lib in the source
@@ -105,18 +130,22 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
 	printf("timer expired %02d\n", i);
 	i++;
+	// write to database ***************************************************************
+	// write to database ***************************************************************
+	// write to database ***************************************************************
+	// write to database ***************************************************************
+	// write to database ***************************************************************
+	// write to database ***************************************************************
+	// write to database ***************************************************************
 }
-
-
-
 
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	int ret ;
+	int ret;
 	char choosed = 0;
 	//-- Start the MiAPI libary
-	if( MiAPI_Start() != MiAPI_OK )
+	if (MiAPI_Start() != MiAPI_OK)
 	{
 		printf("Error: Failed to initialize MiAPI library.\n");
 		return MiAPI_INIT_FAIL;
@@ -124,7 +153,244 @@ int _tmain(int argc, _TCHAR* argv[])
 	ret = Do_MiAPI_Version();
 	printf("--------------------------------------------------------------\n");
 
-//	AfxMessageBox(_T("Simple message box."));
+
+	//{
+	//	SQLHANDLE sqlConnHandle;
+	//	SQLHENV henv;
+	//	SQLHDBC hdbc;
+	//	SQLHSTMT hstmt;
+	//	SQLRETURN retcode;
+	//	SQLWCHAR* retconstring = nullptr;
+
+	//	// Allocate environment handle
+	//	retcode = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
+
+	//	// Set the ODBC version environment attribute
+	//	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+	//		retcode = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
+	//	}
+
+	//	// Allocate connection handle
+	//	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+	//		retcode = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);
+	//	}
+
+	//	// Connect to the database
+	//	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+	//		retcode = SQLDriverConnect(sqlConnHandle,
+	//			NULL,
+	//			(SQLWCHAR*)L"DRIVER={SQL Server};SERVER=WK20018;DATABASE=GADATA01",
+	//			SQL_NTS,
+	//			retconstring,
+	//			1024,
+	//			NULL,
+	//			SQL_DRIVER_NOPROMPT);
+	//		cout << "\nSuccessfully connected to SQL Server\n";
+	//		cout << retcode;
+	//		_getch();
+	//	}
+
+	//	// Allocate statement handle
+	//	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+	//		retcode = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+	//	}
+
+	//	// Execute a query
+	//	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+	//		retcode = SQLExecDirect(hstmt,
+	//			(SQLWCHAR*)L"SELECT * FROM Workcells",
+	//			SQL_NTS);
+	//		cout << "\nSuccessful SELECT\n";
+	//		cout << retcode;
+	//		_getch();
+	//	}
+	//	cout << retcode;
+	//	_getch();
+
+	//	// Fetch and retrieve data using SQLGetData
+	//	if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+	//		int id;
+	//		char name[50];
+
+	//		while (SQLFetch(hstmt) == SQL_SUCCESS) {
+	//			SQLGetData(hstmt, 1, SQL_C_LONG, &id, 0, NULL);
+	//			SQLGetData(hstmt, 2, SQL_C_CHAR, name, sizeof(name), NULL);
+
+	//			std::cout << "ID: " << id << ", Name: " << name << std::endl;
+
+	//			_getch();
+	//		}
+	//	}
+
+	//	// Free handles and disconnect
+	//	SQLFreeHandle(SQL_HANDLE_STMT, hstmt);
+	//	SQLDisconnect(hdbc);
+	//	SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
+	//	SQLFreeHandle(SQL_HANDLE_ENV, henv);
+	//			_getch();
+	//	return 0;
+	//}
+
+
+
+
+
+
+	{
+
+#define SQL_RESULT_LEN 240
+#define SQL_RETURN_CODE_LEN 2000
+		//define handles and variables
+		SQLHANDLE sqlConnHandle;
+		SQLHANDLE sqlStmtHandle;
+		SQLHANDLE sqlEnvHandle;
+		SQLWCHAR retconstring[SQL_RETURN_CODE_LEN];
+		//initializations
+		sqlConnHandle = NULL;
+		sqlStmtHandle = NULL;
+		//allocations
+		if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &sqlEnvHandle))
+			goto COMPLETED;
+		if (SQL_SUCCESS != SQLSetEnvAttr(sqlEnvHandle, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0))
+			goto COMPLETED;
+		if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_DBC, sqlEnvHandle, &sqlConnHandle))
+			goto COMPLETED;
+		//output
+		cout << "Attempting connection to SQL Server...";
+		cout << "\n";
+		switch (SQLDriverConnect(sqlConnHandle,
+			NULL,
+			(SQLWCHAR*)L"DRIVER={SQL Server};SERVER=WK20018;DATABASE=GADATA01",
+			SQL_NTS,
+			retconstring,
+			1024,
+			NULL,
+			SQL_DRIVER_NOPROMPT)) {
+		case SQL_SUCCESS:
+			cout << "Successfully connected to SQL Server";
+			cout << "\n";
+			break;
+		case SQL_SUCCESS_WITH_INFO:
+			cout << "Successfully connected to SQL Server";
+			cout << "\n";
+			break;
+		case SQL_INVALID_HANDLE:
+			cout << "Could not connect to SQL Server";
+			cout << "\n";
+			goto COMPLETED;
+		case SQL_ERROR:
+			cout << "Could not connect to SQL Server";
+			cout << "\n";
+			goto COMPLETED;
+		default:
+			break;
+		}
+		//if there is a problem connecting then exit application
+		if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_STMT, sqlConnHandle, &sqlStmtHandle)) {
+			goto COMPLETED;
+		}
+		//output
+		//else
+		//{
+
+#define CNAME_LEN 50
+			SQLCHAR	cellname[CNAME_LEN];
+			SQLINTEGER	cbname;
+			char convert;
+			cout << "\n";
+			cout << "Executing T-SQL query...\n";
+			while (SQLFetch("Select * From dbo.Workcells WHERE ID = 3") == SQL_SUCCESS) {}
+				SQLGetData(sqlStmtHandle, 2, SQL_C_DEFAULT, cellname, CNAME_LEN, &cbname);
+
+				cout << cellname;
+				cout << "\nSo far so good....\n";
+				cout << "\n";
+			
+		//if there is a problem executing the query then exit application
+		//else display query result
+		if (SQL_SUCCESS != SQLExecDirect(sqlStmtHandle, (SQLWCHAR*)L"SELECT @@VERSION", SQL_NTS)) {
+			cout << "Error querying SQL Server";
+			cout << "\n";
+			goto COMPLETED;
+		}
+		else {
+			//declare output variable and pointer
+			SQLCHAR sqlVersion[SQL_RESULT_LEN];
+			SQLINTEGER ptrSqlVersion;
+			while (SQLFetch(sqlStmtHandle) == SQL_SUCCESS) {
+				SQLGetData(sqlStmtHandle, 1, SQL_CHAR, sqlVersion, SQL_RESULT_LEN, &ptrSqlVersion);
+				//display query result
+				cout << "\nAt Least it didn't crash again!\n";
+				cout << "\nQuery Result:\n\n";
+				cout << sqlVersion << endl;
+			}
+		}
+
+////
+////#define CNAME_LEN 50  
+////
+////		SQLCHAR      cellame[CNAME_LEN];
+////		SQLWCHAR*	 findstatement;
+////		SQLINTEGER   cbName;
+////		SQLRETURN    retcode;
+////		SQLHSTMT     hstmt;
+////
+////		findstatement == "SELECT * FROM Workcells";
+////
+////		retcode = SQLExecDirect(hstmt, findstatement , SQL_NTS);
+////		if (retcode == SQL_SUCCESS) {
+////			while (TRUE) {
+////				retcode = SQLFetch(hstmt);
+////				if (retcode == SQL_ERROR || retcode == SQL_SUCCESS_WITH_INFO) {
+////					//show_error();
+////				}
+////				if (retcode == SQL_SUCCESS || retcode == SQL_SUCCESS_WITH_INFO) {
+////
+////					/* Get data for columns 1, 2, and 3 */
+////
+////		   //         SQLGetData(hstmt, 1, SQL_C_ULONG, &sCustID, 0, &cbCustID);  
+////					SQLGetData(hstmt, 3, SQL_C_CHAR, cellname, CNAME_LEN, &cbName);
+////					//         SQLGetData(hstmt, 3, SQL_C_CHAR, szPhone, PHONE_LEN,  
+////					//            &cbPhone);  
+////
+////							 /* Print the row of data */
+////					cout << cellname;
+////					cout << "\nSo far so good....\n";
+////					cout << "\n";
+////
+////
+////
+////					//         fprintf(out, "%-5d %-*s %*s", sCustID, NAME_LEN-1, szName,   
+////					//            PHONE_LEN-1, szPhone);  
+////				}
+////				else {
+////					break;
+////				}
+////			}
+////		}
+//
+//
+//
+
+
+
+
+
+
+
+
+
+		//close connection and free resources
+	COMPLETED:
+		SQLFreeHandle(SQL_HANDLE_STMT, sqlStmtHandle);
+		SQLDisconnect(sqlConnHandle);
+		SQLFreeHandle(SQL_HANDLE_DBC, sqlConnHandle);
+		SQLFreeHandle(SQL_HANDLE_ENV, sqlEnvHandle);
+		//pause the console window - exit when key is pressed
+		cout << "\nPress any key to exit...\n";
+		_getch();
+	}
+
 
 	// Add a timer
 	{
@@ -137,13 +403,15 @@ int _tmain(int argc, _TCHAR* argv[])
 			TranslateMessage(&Msg);
 			DispatchMessage(&Msg);
 
-			if (kbhit())
+			if (_kbhit())
 			{
-				MiAPI_Exit();
-				break;
+				char ch = _getch();
+				if (ch == VK_ESCAPE)
+				{
+					break;
+				}
 			}
 		}
-		return Msg.wParam;
 	}
 
 	//-- Handle MiAPI　functions
