@@ -243,7 +243,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			cout << "\n";
 			//if there is a problem executing the query then exit application
 			//else display query result
-			if (SQL_SUCCESS != SQLExecDirect(sqlStmtHandle, (SQLWCHAR*)L"SELECT cellname FROM Workcells WHERE ID = 4", SQL_NTS)) {
+			if (SQL_SUCCESS != SQLExecDirect(sqlStmtHandle, (SQLWCHAR*)L"SELECT DESCRIPTION FROM workcenterlist WHERE WCID = 'L14'", SQL_NTS)) {
 				cout << "Error querying SQL Server";
 				cout << "\n";
 				goto COMPLETED;
