@@ -156,10 +156,8 @@ int _tmain(int argc, _TCHAR* argv[])
 
 
 
-
-
 	{
-
+// ********************************************************* SQL query *****************************************************
 #define SQL_RESULT_LEN 240
 #define SQL_RETURN_CODE_LEN 2000
 		//define handles and variables
@@ -208,32 +206,10 @@ int _tmain(int argc, _TCHAR* argv[])
 			break;
 		}
 
-//#define SQL_QUERY_SIZE      256 // Max. Num characters for SQL Query passed in.
-
-		//std::wstring wszInput = L"SELECT * FROM Workcells";
-
-		//SQLCHAR		wszInput[SQL_QUERY_SIZE]{ "SELECT * FROM Workcells" };
-
-		//if there is a problem connecting then exit application
 		if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_STMT, sqlConnHandle, &sqlStmtHandle)) {
 			cout << "\nSome kind of problem....\n";
 			goto COMPLETED;
 		}
-		//output
-		//else
-		//{
-
-		//char passinput = "SELECT * FROM Workcells";
-		//wszInput = passinput;
-
-
-		//if there is a problem executing the query then exit application
-		//else display query result
-		//if (SQL_SUCCESS != SQLExecDirect(sqlStmtHandle, wszInput, SQL_NTS)) {
-		//	cout << "Error querying SQL Server";
-		//	cout << "\n";
-		//	goto COMPLETED;
-		//}
 		else {
 			cout << "\nMade it to the else statement\n";
 
@@ -272,9 +248,14 @@ int _tmain(int argc, _TCHAR* argv[])
 		SQLFreeHandle(SQL_HANDLE_ENV, sqlEnvHandle);
 		//pause the console window - exit when key is pressed
 		cout << "\nPress any key to exit...\n";
-		_getch();
+		char ch = _getch();
+		if (ch == VK_ESCAPE);
+		{
+			cout << "\nGraceful exit\n";
+		}
 	}
 
+	// ********************************************************* End SQL query *****************************************************
 
 	// Add a timer
 	{
