@@ -109,7 +109,7 @@ int Do_MiAPI_GPIO(void)
     return ret;	
 }
 
-int Do_SQL_Query(void)
+int Do_SQL_Query(PWCHAR ptrsqlquerytext)
 //Attempt to move SQL query to it's own little space
 {
 	// ********************************************************* SQL query *****************************************************
@@ -120,7 +120,6 @@ int Do_SQL_Query(void)
 	SQLHANDLE	sqlStmtHandle;
 	SQLHANDLE	sqlEnvHandle;
 	SQLWCHAR	retconstring[SQL_RETURN_CODE_LEN];
-	WCHAR*		wszInput;
 
 	//initializations
 	sqlConnHandle = NULL;
@@ -169,17 +168,13 @@ int Do_SQL_Query(void)
 	}
 	else {
 
-		string IDnumber("3");
-		wszInput = L"SELECT Descript FROM Partmap WHERE PartNum = 29";  //**********************************************
-
-
 		//output
 		cout << "\n";
 		cout << "Executing T-SQL query...";
 		cout << "\n";
 		//if there is a problem executing the query then exit application
 		//else display query result
-		if (SQL_SUCCESS != SQLExecDirect(sqlStmtHandle, wszInput, SQL_NTS)) {
+		if (SQL_SUCCESS != SQLExecDirect(sqlStmtHandle, ptrsqlquerytext, SQL_NTS)) {
 			cout << "Error querying SQL Server";
 			cout << "\n";
 			goto COMPLETED;
@@ -233,6 +228,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	int ret;
 	char choosed = 0;
+	WCHAR* wszInput;
 	//-- Start the MiAPI libary
 	if (MiAPI_Start() != MiAPI_OK)
 	{
@@ -242,7 +238,14 @@ int _tmain(int argc, _TCHAR* argv[])
 	ret = Do_MiAPI_Version();
 	printf("--------------------------------------------------------------\n");
 
-	ret = Do_SQL_Query();
+	// ********************************************* SQL Query call ************************************************
+
+
+
+
+	wszInput = L"SELECT Descript FROM Partmap WHERE PartNum = 29";
+
+	ret = Do_SQL_Query(wszInput);
 
 	// Add a timer
 	{
