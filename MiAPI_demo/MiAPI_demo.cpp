@@ -24,27 +24,9 @@
 #include <string>
 #include <sstream>
 
-//#include "mysql_connection.h" 
-
 #include "../LIB/MiAPI.h"
-//#include "../../../../../../../Windows/Microsoft.NET/Framework/v4.0.30319/System.Data.dll"
-
-//#using < mscorlib.dll>
-//#using < System.dll>
-//#using < System.Data.dll>
-//#using < System.Xml.dll>
-//
-//using namespace System;
-//using namespace System::Data;
-//using namespace System::Data::SqlClient;
 
 using namespace std;
-
-
-
-
-
-
 
 // Alternatively add the following pragma comment, instead of setting up referrence dependence 
 // in compiler environment setting. Be aware to put the same bits version MiAPI.lib in the source
@@ -56,8 +38,7 @@ using namespace std;
 //int TimeToCrash = 0;        //It set a time to simulate application crash for WDT demo.
 
 int i = 0;
-
-
+//char querytext;
 
 //-- Functions start ----
 
@@ -128,9 +109,116 @@ int Do_MiAPI_GPIO(void)
     return ret;	
 }
 
+int Do_SQL_Query(void)
+//Attempt to move SQL query to it's own little space
+{
+	// ********************************************************* SQL query *****************************************************
+#define SQL_RESULT_LEN 240
+#define SQL_RETURN_CODE_LEN 2000
+		//define handles and variables
+	SQLHANDLE	sqlConnHandle;
+	SQLHANDLE	sqlStmtHandle;
+	SQLHANDLE	sqlEnvHandle;
+	SQLWCHAR	retconstring[SQL_RETURN_CODE_LEN];
+	WCHAR*		wszInput;
+
+	//initializations
+	sqlConnHandle = NULL;
+	sqlStmtHandle = NULL;
+	//allocations
+	if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &sqlEnvHandle))
+		goto COMPLETED;
+	if (SQL_SUCCESS != SQLSetEnvAttr(sqlEnvHandle, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0))
+		goto COMPLETED;
+	if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_DBC, sqlEnvHandle, &sqlConnHandle))
+		goto COMPLETED;
+	//output
+	printf("Attempting connection to SQL Server...");
+	printf("\n");
+	switch (SQLDriverConnect(sqlConnHandle,
+		NULL,
+		(SQLWCHAR*)L"DRIVER={SQL Server};SERVER=WK20018;DATABASE=GADATA01",
+		SQL_NTS,
+		retconstring,
+		1024,
+		NULL,
+		SQL_DRIVER_NOPROMPT)) {
+	case SQL_SUCCESS:
+		printf("Successfully connected to SQL Server");
+		printf("\n");
+		break;
+	case SQL_SUCCESS_WITH_INFO:
+		cout << "Successfully connected to SQL Server";
+		cout << "\n";
+		break;
+	case SQL_INVALID_HANDLE:
+		cout << "Could not connect to SQL Server";
+		cout << "\n";
+		goto COMPLETED;
+	case SQL_ERROR:
+		cout << "Could not connect to SQL Server";
+		cout << "\n";
+		goto COMPLETED;
+	default:
+		break;
+	}
+
+	if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_STMT, sqlConnHandle, &sqlStmtHandle)) {
+		cout << "\nSome kind of problem....\n";
+		goto COMPLETED;
+	}
+	else {
+
+		string IDnumber("3");
+		wszInput = L"SELECT Descript FROM Partmap WHERE PartNum = 29";  //**********************************************
+
+
+		//output
+		cout << "\n";
+		cout << "Executing T-SQL query...";
+		cout << "\n";
+		//if there is a problem executing the query then exit application
+		//else display query result
+		if (SQL_SUCCESS != SQLExecDirect(sqlStmtHandle, wszInput, SQL_NTS)) {
+			cout << "Error querying SQL Server";
+			cout << "\n";
+			goto COMPLETED;
+		}
+
+		//declare output variable and pointer
+		SQLCHAR sqlcelltext[SQL_RESULT_LEN];
+		SQLINTEGER ptrsqlcelltext;
+		while (SQLFetch(sqlStmtHandle) == SQL_SUCCESS) {
+			SQLGetData(sqlStmtHandle, 1, SQL_CHAR, sqlcelltext, SQL_RESULT_LEN, &ptrsqlcelltext);
+			//display query result
+			cout << "\nQuery Result: ";
+			cout << sqlcelltext << endl;
+		}
+	}
+
+
+	//close connection and free resources
+COMPLETED:
+	SQLFreeHandle(SQL_HANDLE_STMT, sqlStmtHandle);
+	SQLDisconnect(sqlConnHandle);
+	SQLFreeHandle(SQL_HANDLE_DBC, sqlConnHandle);
+	SQLFreeHandle(SQL_HANDLE_ENV, sqlEnvHandle);
+	//pause the console window - exit when key is pressed
+	cout << "\nPress ESC key to exit...\n";
+	char ch = _getch();
+	if (ch == VK_ESCAPE);
+	{
+		cout << "\nGraceful exit\n";
+	}
+	return(0);
+}
+
+//}
+
+
 VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-	printf("timer expired %02d\n", i);
+	printf("timer tick %02d\n", i);
 	i++;
 	// write to database ***************************************************************
 	// write to database ***************************************************************
@@ -154,108 +242,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	ret = Do_MiAPI_Version();
 	printf("--------------------------------------------------------------\n");
 
-
-
-	{
-// ********************************************************* SQL query *****************************************************
-#define SQL_RESULT_LEN 240
-#define SQL_RETURN_CODE_LEN 2000
-		//define handles and variables
-		SQLHANDLE sqlConnHandle;
-		SQLHANDLE sqlStmtHandle;
-		SQLHANDLE sqlEnvHandle;
-		SQLWCHAR retconstring[SQL_RETURN_CODE_LEN];
-		//initializations
-		sqlConnHandle = NULL;
-		sqlStmtHandle = NULL;
-		//allocations
-		if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &sqlEnvHandle))
-			goto COMPLETED;
-		if (SQL_SUCCESS != SQLSetEnvAttr(sqlEnvHandle, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0))
-			goto COMPLETED;
-		if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_DBC, sqlEnvHandle, &sqlConnHandle))
-			goto COMPLETED;
-		//output
-		cout << "Attempting connection to SQL Server...";
-		cout << "\n";
-		switch (SQLDriverConnect(sqlConnHandle,
-			NULL,
-			(SQLWCHAR*)L"DRIVER={SQL Server};SERVER=WK20018;DATABASE=GADATA01",
-			SQL_NTS,
-			retconstring,
-			1024,
-			NULL,
-			SQL_DRIVER_NOPROMPT)) {
-		case SQL_SUCCESS:
-			cout << "Successfully connected to SQL Server";
-			cout << "\n";
-			break;
-		case SQL_SUCCESS_WITH_INFO:
-			cout << "Successfully connected to SQL Server";
-			cout << "\n";
-			break;
-		case SQL_INVALID_HANDLE:
-			cout << "Could not connect to SQL Server";
-			cout << "\n";
-			goto COMPLETED;
-		case SQL_ERROR:
-			cout << "Could not connect to SQL Server";
-			cout << "\n";
-			goto COMPLETED;
-		default:
-			break;
-		}
-
-		if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_STMT, sqlConnHandle, &sqlStmtHandle)) {
-			cout << "\nSome kind of problem....\n";
-			goto COMPLETED;
-		}
-		else {
-			cout << "\nMade it to the else statement\n";
-
-			//output
-			cout << "\n";
-			cout << "Executing T-SQL query...";
-			cout << "\n";
-			//if there is a problem executing the query then exit application
-			//else display query result
-			if (SQL_SUCCESS != SQLExecDirect(sqlStmtHandle, (SQLWCHAR*)L"SELECT DESCRIPTION FROM workcenterlist WHERE WCID = 'L14'", SQL_NTS)) {
-				cout << "Error querying SQL Server";
-				cout << "\n";
-				goto COMPLETED;
-			}
-
-			//declare output variable and pointer
-			SQLCHAR sqlVersion[SQL_RESULT_LEN];
-			SQLINTEGER ptrSqlVersion;
-			cout << "\nVariables are set.\n";
-			while (SQLFetch(sqlStmtHandle) == SQL_SUCCESS) {
-				SQLGetData(sqlStmtHandle, 1, SQL_CHAR, sqlVersion, SQL_RESULT_LEN, &ptrSqlVersion);
-				//display query result
-				cout << "\nAt Least it didn't crash again!\n";
-				cout << "\nQuery Result: ";
-				cout << sqlVersion << endl;
-				cout << "\nAll that from sqlVersion\n\n";
-			}
-		}
-
-
-		//close connection and free resources
-	COMPLETED:
-		SQLFreeHandle(SQL_HANDLE_STMT, sqlStmtHandle);
-		SQLDisconnect(sqlConnHandle);
-		SQLFreeHandle(SQL_HANDLE_DBC, sqlConnHandle);
-		SQLFreeHandle(SQL_HANDLE_ENV, sqlEnvHandle);
-		//pause the console window - exit when key is pressed
-		cout << "\nPress any key to exit...\n";
-		char ch = _getch();
-		if (ch == VK_ESCAPE);
-		{
-			cout << "\nGraceful exit\n";
-		}
-	}
-
-	// ********************************************************* End SQL query *****************************************************
+	ret = Do_SQL_Query();
 
 	// Add a timer
 	{
@@ -278,6 +265,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 		}
 	}
+
 
 	//-- Handle MiAPI　functions
 	do {
