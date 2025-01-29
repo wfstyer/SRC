@@ -21,8 +21,10 @@
 #include <stdlib.h>
 #include <sal.h>
 #include <tchar.h>
+#include <wchar.h>
 #include <string>
 #include <sstream>
+#include <cwchar>
 
 #include "../LIB/MiAPI.h"
 
@@ -112,7 +114,6 @@ int Do_MiAPI_GPIO(void)
 int Do_SQL_Query(PWCHAR ptrsqlquerytext)
 //Attempt to move SQL query to it's own little space
 {
-	// ********************************************************* SQL query *****************************************************
 #define SQL_RESULT_LEN 240
 #define SQL_RETURN_CODE_LEN 2000
 		//define handles and variables
@@ -208,8 +209,6 @@ COMPLETED:
 	return(0);
 }
 
-//}
-
 
 VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
@@ -227,8 +226,10 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 int _tmain(int argc, _TCHAR* argv[])
 {
 	int ret;
+	int partnumber = 29;
 	char choosed = 0;
-	WCHAR* wszInput;
+	wchar_t *queryvariable;
+
 	//-- Start the MiAPI libary
 	if (MiAPI_Start() != MiAPI_OK)
 	{
@@ -239,13 +240,21 @@ int _tmain(int argc, _TCHAR* argv[])
 	printf("--------------------------------------------------------------\n");
 
 	// ********************************************* SQL Query call ************************************************
+	wchar_t querybody[256] = L"SELECT Descript FROM Partmap WHERE PartNum = ";
 
 
+	queryvariable = L"29";
+	wcscat(querybody, queryvariable);
+
+	cout << "\nQuery Body: ";
+	cout << &querybody;
+	cout << "\n";
+
+	ret = Do_SQL_Query(querybody);
 
 
-	wszInput = L"SELECT Descript FROM Partmap WHERE PartNum = 29";
+	// ********************************************* SQL Query call ************************************************
 
-	ret = Do_SQL_Query(wszInput);
 
 	// Add a timer
 	{
