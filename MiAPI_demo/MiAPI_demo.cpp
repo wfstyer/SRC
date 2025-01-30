@@ -80,35 +80,71 @@ int Do_MiAPI_GPIO(void)
 	int ret = MiAPI_OK;
 	MIAPI_GPIO_STATUS gpio[10];
 	
-		
-	printf("*** GPIO demo ***\n");
-	printf("This demo will set the GPIO 1~5 as input \n  and GPIO 6~10 as output low.");
+	//printf("*** GPIO demo ***\n");
+	//printf("This demo will set the GPIO 5~10 as input \n  and GPIO 1~4 as output low.");
 	
-	//--Set GPIO 1~5 to input
-	for(int i = 1; i<=5; i++)
+	//--Set GPIO 5~10 to input
+	for(int i = 5; i<=10; i++)
 	{
        gpio[i-1].Direction = 0x01;     //input = 0x01; output = 0x00 for MiAPI v3.1;
 	   gpio[i-1].VoltageLevel = 0x00;  // for input mode, this voltage level is dummy value as no use.
 	   ret = MiAPI_GPIO_SetStatus(i, gpio[i-1]);	   
 	}	
 		
-	//--Set GPIO 6~10 to output low
-	for(int i = 6; i<=10; i++)
+	//--Set GPIO 1~4 to output low
+	for(int i = 1; i<=4; i++)
 	{
        gpio[i-1].Direction = 0x00;     //input = 0x01; output = 0x00 for MiAPI v3.1;
 	   gpio[i-1].VoltageLevel = 0x00;  // Low = 0x00; High = 0x01
 	   ret = MiAPI_GPIO_SetStatus(i, gpio[i-1]);	   
 	}	
 		
-	//-- Show  all GPIO status
-	for (int i =1; i <= 10; i++ )
-	{
-    //--Get GPIO status from each GPIO
-	    ret = MiAPI_GPIO_GetStatus((BYTE)i, &(gpio[i-1]));	
-		printf("  GPIO %02d  :  DIR=%d  LEVEL=%d (Err=%02Xh)\n", i, gpio[i-1].Direction, gpio[i-1].VoltageLevel, ret);
-	}
+	////-- Show  all GPIO status
+	//for (int i =1; i <= 10; i++ )
+	//{
+ //   //--Get GPIO status from each GPIO
+	//    ret = MiAPI_GPIO_GetStatus((BYTE)i, &(gpio[i-1]));	
+	//	printf("  GPIO %02d  :  DIR=%d  LEVEL=%d (Err=%02Xh)\n", i, gpio[i-1].Direction, gpio[i-1].VoltageLevel, ret);
+	//}
 
     return ret;	
+}
+
+int Read_MiAPI_GPIO(int gpioaddress)
+{
+	int ret = MiAPI_OK;
+	MIAPI_GPIO_STATUS gpio[10];
+	if (gpioaddress >= 5)
+		if (gpioaddress <= 10)
+			{
+				ret = MiAPI_GPIO_GetStatus((BYTE)gpioaddress, &(gpio[gpioaddress-1]));
+				return(gpio[gpioaddress - 1].VoltageLevel);
+			}
+		else
+		{
+			return ret;
+		}
+}
+
+int Write_MiAPI_GPIO(int gpioaddress, bool gpiohighlow)
+{
+	int ret = MiAPI_OK;
+	MIAPI_GPIO_STATUS gpio[10];
+	if (gpioaddress >= 1)
+		if (gpioaddress <= 4)
+		{
+			gpio[i - 1].Direction = 0x00;     //input = 0x01; output = 0x00 for MiAPI v3.1;
+			if (gpiohighlow)
+			{
+				gpio[gpioaddress - 1].VoltageLevel = 0x01;  // Low = 0x00; High = 0x01
+			}
+			else
+			{
+				gpio[gpioaddress - 1].VoltageLevel = 0x00;  // Low = 0x00; High = 0x01
+			}
+			ret = MiAPI_GPIO_SetStatus(gpioaddress, gpio[gpioaddress - 1]);
+		}
+	return ret;
 }
 
 int Do_SQL_Query(PWCHAR ptrsqlquerytext)
@@ -226,9 +262,10 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 int _tmain(int argc, _TCHAR* argv[])
 {
 	int ret;
-	int partnumber = 29;
+	//int partnumber = 29;
 	char choosed = 0;
 	wchar_t *queryvariable;
+	wchar_t* partnumber = L"29";
 
 	//-- Start the MiAPI libary
 	if (MiAPI_Start() != MiAPI_OK)
@@ -240,10 +277,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	printf("--------------------------------------------------------------\n");
 
 	// ********************************************* SQL Query call ************************************************
-	wchar_t querybody[256] = L"SELECT Descript FROM Partmap WHERE PartNum = ";
 
+	wchar_t querybody[1024] = L"SELECT Descript FROM Partmap WHERE PartNum = ";
 
-	queryvariable = L"29";
+	//wchar_t queryvariable = std::to_wstring(partnumber);
+	queryvariable = partnumber;
 	wcscat(querybody, queryvariable);
 
 	cout << "\nQuery Body: ";
