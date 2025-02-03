@@ -78,7 +78,8 @@ int Do_MiAPI_GPIO(void)
 // hold the GPIO setting(Input/Output) and value(High/Low). 
 {
 	int ret = MiAPI_OK;
-	MIAPI_GPIO_STATUS gpio[10];
+	// ******************** remember it didn't have {} originally ********************
+	MIAPI_GPIO_STATUS gpio[10]{};
 	
 	//printf("*** GPIO demo ***\n");
 	//printf("This demo will set the GPIO 5~10 as input \n  and GPIO 1~4 as output low.");
@@ -99,6 +100,7 @@ int Do_MiAPI_GPIO(void)
 	   ret = MiAPI_GPIO_SetStatus(i, gpio[i-1]);	   
 	}	
 		
+
 	////-- Show  all GPIO status
 	//for (int i =1; i <= 10; i++ )
 	//{
@@ -113,7 +115,7 @@ int Do_MiAPI_GPIO(void)
 int Read_MiAPI_GPIO(int gpioaddress)
 {
 	int ret = MiAPI_OK;
-	MIAPI_GPIO_STATUS gpio[10];
+	MIAPI_GPIO_STATUS gpio[10]{};
 	if (gpioaddress >= 5)
 		if (gpioaddress <= 10)
 			{
@@ -129,7 +131,7 @@ int Read_MiAPI_GPIO(int gpioaddress)
 int Write_MiAPI_GPIO(int gpioaddress, bool gpiohighlow)
 {
 	int ret = MiAPI_OK;
-	MIAPI_GPIO_STATUS gpio[10];
+	MIAPI_GPIO_STATUS gpio[10]{};
 	if (gpioaddress >= 1)
 		if (gpioaddress <= 4)
 		{
@@ -236,59 +238,137 @@ COMPLETED:
 	SQLFreeHandle(SQL_HANDLE_DBC, sqlConnHandle);
 	SQLFreeHandle(SQL_HANDLE_ENV, sqlEnvHandle);
 	//pause the console window - exit when key is pressed
-	cout << "\nPress ESC key to exit...\n";
-	char ch = _getch();
-	if (ch == VK_ESCAPE);
-	{
-		cout << "\nGraceful exit\n";
-	}
+	//cout << "\nPress ESC key to exit...\n";
+	//char ch = _getch();
+	//if (ch == VK_ESCAPE);
+	//{
+	//	cout << "\nGraceful exit\n";
+	//}
 	return(0);
 }
 
 
 VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
-	printf("timer tick %02d\n", i);
-	i++;
-	// write to database ***************************************************************
-	// write to database ***************************************************************
-	// write to database ***************************************************************
-	// write to database ***************************************************************
-	// write to database ***************************************************************
-	// write to database ***************************************************************
-	// write to database ***************************************************************
+
+	int ret;
+	// -- check GPIO for input status
+
+
+	wchar_t querybody[1024] = L"UPDATE TestStandX1 SET ";
+	wchar_t* queryvariable;
+	wchar_t* querysuffix = L" WHERE ID = 1";
+
+	for (int i = 5; i <= 8; i++)
+	{
+		ret = Read_MiAPI_GPIO(i);
+		if (ret >=0 )
+			if (ret <= 1)
+			{
+				switch (i)
+				{
+				case 5:
+					if (ret)
+					{
+						queryvariable = L"PumpOn = 1";
+						break;
+					}
+					else
+					{
+						queryvariable = L"PumpOn = 0";
+						break;
+					}
+				case 6:
+					if (ret)
+					{
+						queryvariable = L"Filter_1 = 1";
+						ret = Write_MiAPI_GPIO(1, 0);
+						break;
+					}
+					else
+					{
+						queryvariable = L"Filter_1 = 0";
+						break;
+					}
+				case 7:
+					if (ret)
+					{
+						queryvariable = L"Filter_2 = 1";
+						ret = Write_MiAPI_GPIO(1, 0);
+						break;
+					}
+					else
+					{
+						queryvariable = L"Filter_2 = 0";
+						break;
+					}
+				case 8:
+					if (ret)
+					{
+						queryvariable = L"EStop = 1";
+						break;
+					}
+					else
+					{
+						queryvariable = L"EStop = 0";
+						break;
+					}
+				default:
+					break;
+				}
+
+				wcscat(querybody, queryvariable);
+				wcscat(querybody, querysuffix);
+				ret = Do_SQL_Query(querybody);
+			}
+	}
+
+	//printf("timer tick %02d\n", i);
+	//i++;
 }
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 	int ret;
-	//int partnumber = 29;
 	char choosed = 0;
-	wchar_t *queryvariable;
-	wchar_t* partnumber = L"29";
+	//wchar_t *queryvariable;
+	//wchar_t* partnumber = L"29";
 
 	//-- Start the MiAPI libary
 	if (MiAPI_Start() != MiAPI_OK)
 	{
-		printf("Error: Failed to initialize MiAPI library.\n");
+		//printf("Error: Failed to initialize MiAPI library.\n");
 		return MiAPI_INIT_FAIL;
 	}
-	ret = Do_MiAPI_Version();
-	printf("--------------------------------------------------------------\n");
+	else
+	{
+		// -- Initialize GPIO inputs/outputs
+		ret = Do_MiAPI_GPIO();
+	}
+
+	do {
+		printf("\n=== PM Check ===\n");
+		printf("  1 : Enter 1 to Confirm PM is done\n");
+		choosed = _getche();
+		printf("\n\n");
+	} while (choosed != '1');
+
+	//ret = Do_MiAPI_Version();
+	//printf("--------------------------------------------------------------\n");
 
 	// ********************************************* SQL Query call ************************************************
 
-	wchar_t querybody[1024] = L"SELECT Descript FROM Partmap WHERE PartNum = ";
+	//wchar_t querybody[1024] = L"SELECT Descript FROM Partmap WHERE PartNum = ";
 
 	//wchar_t queryvariable = std::to_wstring(partnumber);
-	queryvariable = partnumber;
-	wcscat(querybody, queryvariable);
+	//queryvariable = partnumber;
+	//wcscat(querybody, queryvariable);
 
-	cout << "\nQuery Body: ";
-	cout << &querybody;
-	cout << "\n";
+	//cout << "\nQuery Body: ";
+	//cout << &querybody;
+	//cout << "\n";
 
-	ret = Do_SQL_Query(querybody);
+	//ret = Do_SQL_Query(querybody);
 
 
 	// ********************************************* SQL Query call ************************************************
@@ -297,8 +377,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	// Add a timer
 	{
 		MSG Msg;
-		/* Set up the timer to go off every half second */
-		SetTimer(NULL, 0, 500, TimerProc);
+		/* Set up the timer to go off every three seconds */
+		SetTimer(NULL, 0, 3000, TimerProc);
 		/* Process all messages */
 		while (GetMessage(&Msg, NULL, 0, 0) > 0)
 		{
@@ -316,55 +396,13 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 	}
 
-
 	//-- Handle MiAPI　functions
 	do {
-		printf("\n=== Demo Menu ===\n");
+		printf("\n=== Exit Menu ===\n");
 		printf("  0 : Exit\n");
-		//printf("  1 : Show BIOS & MiAPI version\n");
-		//printf("  2 : HW monitoring\n");
-		//printf("  3 : GPIO setting\n");
-		//printf("  4 : SMBUS scan\n");
-		//printf("  5 : Display Control\n");
-		//printf("  6 : Watchdog\n");
-		//printf("Choose (0 ~ 6) : ");
 		choosed = _getche();
 		printf("\n\n");
-		
-	 //--  Call MiAPI functions 
-		//switch(choosed)
-		//{
-		//   case '0' :  //Exit
-		//	   printf(" Exit...\n");
-		//	   break;
-
-		//   case '1' :
-		//	   ret = Do_MiAPI_Version();
-		//	   break;
-
-  //         case '2' :
-		//	   ret = DO_MiAPI_HWMonitoring();
-		//	   break;
-
-  //         case '3' :
-		//	   ret = Do_MiAPI_GPIO();
-		//	   break;
-
-  //         case '4' :
-		//	   ret = Do_MiAPI_SMBUS_SCAN();
-		//	   break;
-
-		//   case '5' :
-		//	   ret = Do_MiAPI_DisplayControl();
-		//	   break;
-
-  //         case '6' :
-		//	   ret = Do_MiAPI_WDT();
-		//	   break;		   
-		//}
-
 	} while (choosed != '0');
-			
 
 	//-- It must call MiAPI_Exit() to free the resource when MiAPI exits. 	
 	MiAPI_Exit();	
