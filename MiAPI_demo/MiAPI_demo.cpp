@@ -270,47 +270,47 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 				case 5:
 					if (ret)
 					{
-						queryvariable = L"PumpOn = 1";
+						queryvariable = L"PumpOn = 0"; // if circuit closed then pump is off
 						break;
 					}
 					else
 					{
-						queryvariable = L"PumpOn = 0";
+						queryvariable = L"PumpOn = 1"; // if circuit open then pump is on
 						break;
 					}
 				case 6:
 					if (ret)
 					{
-						queryvariable = L"Filter_1 = 1";
-						ret = Write_MiAPI_GPIO(1, 0);
+						queryvariable = L"Filter_1 = 0"; // if circuit closed then filter is clean
 						break;
 					}
 					else
 					{
-						queryvariable = L"Filter_1 = 0";
+						queryvariable = L"Filter_1 = 1"; // if circuit open then filter is dirty
+						ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
 						break;
 					}
 				case 7:
 					if (ret)
 					{
-						queryvariable = L"Filter_2 = 1";
-						ret = Write_MiAPI_GPIO(1, 0);
+						queryvariable = L"Filter_2 = 0"; // if circuit closed then filter is clean
 						break;
 					}
 					else
 					{
-						queryvariable = L"Filter_2 = 0";
+						queryvariable = L"Filter_2 = 1"; // if circuit open then filter is dirty
+						ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
 						break;
 					}
 				case 8:
 					if (ret)
 					{
-						queryvariable = L"EStop = 1";
+						queryvariable = L"EStop = 0"; // if EStop circuit closed then EStop (flip side of EStop relay)
 						break;
 					}
 					else
 					{
-						queryvariable = L"EStop = 0";
+						queryvariable = L"EStop = 1"; // if EStop circuit open then not EStop (Estop relay closed - feedback open)
 						break;
 					}
 				default:
