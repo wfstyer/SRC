@@ -346,12 +346,12 @@ int _tmain(int argc, _TCHAR* argv[])
 		ret = Do_MiAPI_GPIO();
 	}
 
-	do {
-		printf("\n=== PM Check ===\n");
-		printf("  1 : Enter 1 to Confirm PM is done\n");
-		choosed = _getche();
-		printf("\n\n");
-	} while (choosed != '1');
+	//do {
+	//	printf("\n=== PM Check ===\n");
+	//	printf("  1 : Enter 1 to Confirm PM is done\n");
+	//	choosed = _getche();
+	//	printf("\n\n");
+	//} while (choosed != '1');
 
 	//ret = Do_MiAPI_Version();
 	//printf("--------------------------------------------------------------\n");
