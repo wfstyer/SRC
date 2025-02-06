@@ -160,6 +160,8 @@ int Do_SQL_Query(PWCHAR ptrsqlquerytext)
 	SQLHANDLE	sqlEnvHandle;
 	SQLWCHAR	retconstring[SQL_RETURN_CODE_LEN];
 
+	int ret = 0;
+
 	//initializations
 	sqlConnHandle = NULL;
 	sqlStmtHandle = NULL;
@@ -227,6 +229,7 @@ int Do_SQL_Query(PWCHAR ptrsqlquerytext)
 			//display query result
 			cout << "\nQuery Result: ";
 			cout << sqlcelltext << endl;
+			ret = std::stoi(reinterpret_cast<const char*>(sqlcelltext));
 		}
 	}
 
@@ -244,7 +247,7 @@ COMPLETED:
 	//{
 	//	cout << "\nGraceful exit\n";
 	//}
-	return(0);
+	return(ret);
 }
 
 
@@ -252,9 +255,19 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
 
 	int ret;
+	// -- check EStop status in database -- set/reset EStop relay
+	wchar_t checkEStop[1024] = L"SELECT EStop FROM TestStandX1 WHERE ID = 1";
+	ret = Do_SQL_Query(checkEStop);
+	if (ret != 1)
+	{
+		ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
+	}
+	else
+	{
+		ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
+	}
+
 	// -- check GPIO for input status
-
-
 	wchar_t querybody[1024] = L"UPDATE TestStandX1 SET ";
 	wchar_t* queryvariable;
 	wchar_t* querysuffix = L" WHERE ID = 1";
@@ -305,12 +318,14 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 				case 8:
 					if (ret)
 					{
-						queryvariable = L"EStop = 0"; // if EStop circuit closed then EStop (flip side of EStop relay)
+						queryvariable = L"EStop = 1"; // if EStop circuit closed then EStop (flip side of EStop relay)
+						ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
 						break;
 					}
 					else
 					{
-						queryvariable = L"EStop = 1"; // if EStop circuit open then not EStop (Estop relay closed - feedback open)
+						queryvariable = L"EStop = 0"; // if EStop circuit open then not EStop (Estop relay closed - feedback open)
+						ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
 						break;
 					}
 				default:
