@@ -318,14 +318,14 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 				case 8:
 					if (ret)
 					{
-						queryvariable = L"EStop = 1"; // if EStop circuit closed then EStop (flip side of EStop relay)
-						ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
+						queryvariable = L"EStop = 0"; // if EStop circuit high then not EStop
+						ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
 						break;
 					}
 					else
 					{
-						queryvariable = L"EStop = 0"; // if EStop circuit open then not EStop (Estop relay closed - feedback open)
-						ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
+						queryvariable = L"EStop = 1"; // if EStop circuit low then EStop
+						ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
 						break;
 					}
 				default:
