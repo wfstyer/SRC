@@ -177,7 +177,7 @@ int Do_SQL_Query(PWCHAR ptrsqlquerytext)
 	printf("\n");
 	switch (SQLDriverConnect(sqlConnHandle,
 		NULL,
-		(SQLWCHAR*)L"DRIVER={SQL Server};SERVER=WK20018;DATABASE=GADATA01",
+		(SQLWCHAR*)L"DRIVER={SQL Server};SERVER=192.168.9.82;DATABASE=GADATA01",
 		SQL_NTS,
 		retconstring,
 		1024,
@@ -373,7 +373,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	// ********************************************* SQL Query call ************************************************
 
-	//wchar_t querybody[1024] = L"SELECT Descript FROM Partmap WHERE PartNum = ";
+	//wchar_t querybody[1024] = L"SELECT Descript FROM Partmap WHERE PartNum = 38";
 
 	//wchar_t queryvariable = std::to_wstring(partnumber);
 	//queryvariable = partnumber;
@@ -385,6 +385,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	//ret = Do_SQL_Query(querybody);
 
+	//cout << ret;
 
 	// ********************************************* SQL Query call ************************************************
 
