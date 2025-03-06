@@ -260,7 +260,7 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 	ret == 0;
 	int statusvariable;
 
-	std::ifstream inFile("C:\GPIO\machinestatus.txt");
+	std::ifstream inFile("machinestatus.txt");
 	std::string line;
 
 	if (inFile.is_open())
@@ -305,7 +305,7 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 
 
 	std::ofstream myFile;
-	myFile.open("C:\GPIO\machinestatus.txt");
+	myFile.open("machinestatus.txt");
 
 
 
