@@ -288,15 +288,20 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 	//ret = Do_SQL_Query(checkEStop);
 
 	
+	// ******************** flipping back and forth on estop ??? **************************************************
+
+
 	// ** check estop here **
 
 
 	if (ret != 0)
 	{
+		cout << ret << "EStop condition - open EStop relay ****\n";
 		ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
 	}
 	else
 	{
+		cout << ret << "Run condition - close EStop relay ****\n";
 		ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
 	}
 
@@ -385,7 +390,7 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 				}
 
 				myFile << statusvariable << "\n";
-				cout << statusvariable << "\n";
+				cout << i << "-" << statusvariable << "****\n";
 
 
 
