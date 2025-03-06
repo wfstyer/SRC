@@ -291,7 +291,7 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 	// ** check estop here **
 
 
-	if (ret != 1)
+	if (ret != 0)
 	{
 		ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
 	}
