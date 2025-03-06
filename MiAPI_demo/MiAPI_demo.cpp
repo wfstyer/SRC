@@ -259,17 +259,28 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 	int ret;
 	int statusvariable;
 
-	std::ifstream inFile("Z:\Program Deployment\MiAPI\machinestatus.txt");
+	std::ifstream inFile("C:\GPIO\machinestatus.txt");
 	std::string line;
-	std::getline(inFile, line);
-	std::getline(inFile, line);
-	std::getline(inFile, line);
-	std::getline(inFile, line);
 
-	ret = std::stoi(line);
+	if (inFile.is_open())
+	{
+		std::getline(inFile, line);
+		cout << line << "\n";
+		std::getline(inFile, line);
+		cout << line << "\n";
+		std::getline(inFile, line);
+		cout << line << "\n";
+		std::getline(inFile, line);
+		cout << line << "\n\n";
 
-	inFile.close();
+		ret = std::stoi(line);
 
+		inFile.close();
+	}
+	else
+	{
+		std::cerr << "unable to open file";
+	}
 
 	// -- check EStop status in database -- set/reset EStop relay
 	//wchar_t checkEStop[1024] = L"SELECT EStop FROM TestStandX1 WHERE ID = 1";
@@ -293,7 +304,7 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 
 
 	std::ofstream myFile;
-	myFile.open("Z:\Program Deployment\MiAPI\machinestatus.txt");
+	myFile.open("C:\GPIO\machinestatus.txt");
 
 
 
@@ -373,6 +384,7 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 				}
 
 				myFile << statusvariable << "\n";
+				cout << statusvariable << "\n";
 
 
 
@@ -386,7 +398,7 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 			}
 	}
 
-
+	cout << "\n";
 	myFile.close();
 
 	//printf("timer tick %02d\n", i);
