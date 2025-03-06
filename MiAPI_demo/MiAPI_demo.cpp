@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <conio.h>
 #include <iostream>
+#include <fstream>
 #include <time.h> 
 
 #include <sql.h>
@@ -25,6 +26,7 @@
 #include <string>
 #include <sstream>
 #include <cwchar>
+//#include "tinyxml2.h"
 
 #include "../LIB/MiAPI.h"
 
@@ -255,9 +257,28 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
 
 	int ret;
+	int statusvariable;
+
+	std::ifstream inFile("Z:\Program Deployment\MiAPI\machinestatus.txt");
+	std::string line;
+	std::getline(inFile, line);
+	std::getline(inFile, line);
+	std::getline(inFile, line);
+	std::getline(inFile, line);
+
+	ret = std::stoi(line);
+
+	inFile.close();
+
+
 	// -- check EStop status in database -- set/reset EStop relay
-	wchar_t checkEStop[1024] = L"SELECT EStop FROM TestStandX1 WHERE ID = 1";
-	ret = Do_SQL_Query(checkEStop);
+	//wchar_t checkEStop[1024] = L"SELECT EStop FROM TestStandX1 WHERE ID = 1";
+	//ret = Do_SQL_Query(checkEStop);
+
+	
+	// ** check estop here **
+
+
 	if (ret != 1)
 	{
 		ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
@@ -268,9 +289,20 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 	}
 
 	// -- check GPIO for input status
-	wchar_t querybody[1024] = L"UPDATE TestStandX1 SET ";
-	wchar_t* queryvariable;
-	wchar_t* querysuffix = L" WHERE ID = 1";
+
+
+
+	std::ofstream myFile;
+	myFile.open("Z:\Program Deployment\MiAPI\machinestatus.txt");
+
+
+
+
+	//wchar_t querybody[1024] = L"UPDATE TestStandX1 SET ";
+	//wchar_t* queryvariable;
+	//wchar_t* querysuffix = L" WHERE ID = 1";
+
+
 
 	for (int i = 5; i <= 8; i++)
 	{
@@ -283,60 +315,79 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 				case 5:
 					if (ret)
 					{
-						queryvariable = L"PumpOn = 0"; // if circuit closed then pump is off
+						//queryvariable = L"PumpOn = 0"; // if circuit closed then pump is off
+						statusvariable = 0;
 						break;
 					}
 					else
 					{
-						queryvariable = L"PumpOn = 1"; // if circuit open then pump is on
+						//queryvariable = L"PumpOn = 1"; // if circuit open then pump is on
+						statusvariable = 1;
 						break;
 					}
 				case 6:
 					if (ret)
 					{
-						queryvariable = L"Filter_1 = 0"; // if circuit closed then filter is clean
+						//queryvariable = L"Filter_1 = 0"; // if circuit closed then filter is clean
+						statusvariable = 0;
 						break;
 					}
 					else
 					{
-						queryvariable = L"Filter_1 = 1"; // if circuit open then filter is dirty
+						//queryvariable = L"Filter_1 = 1"; // if circuit open then filter is dirty
 						ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
+						statusvariable = 1;
 						break;
 					}
 				case 7:
 					if (ret)
 					{
-						queryvariable = L"Filter_2 = 0"; // if circuit closed then filter is clean
+						//queryvariable = L"Filter_2 = 0"; // if circuit closed then filter is clean
+						statusvariable = 0;
 						break;
 					}
 					else
 					{
-						queryvariable = L"Filter_2 = 1"; // if circuit open then filter is dirty
+						//queryvariable = L"Filter_2 = 1"; // if circuit open then filter is dirty
 						ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
+						statusvariable = 1;
 						break;
 					}
 				case 8:
 					if (ret)
 					{
-						queryvariable = L"EStop = 0"; // if EStop circuit high then not EStop
+						//queryvariable = L"EStop = 0"; // if EStop circuit high then not EStop
 						ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
+						statusvariable = 0;
 						break;
 					}
 					else
 					{
-						queryvariable = L"EStop = 1"; // if EStop circuit low then EStop
+						//queryvariable = L"EStop = 1"; // if EStop circuit low then EStop
 						ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
+						statusvariable = 1;
 						break;
 					}
 				default:
 					break;
 				}
 
-				wcscat(querybody, queryvariable);
-				wcscat(querybody, querysuffix);
-				ret = Do_SQL_Query(querybody);
+				myFile << statusvariable << "\n";
+
+
+
+				// - comment out SQL query for the moment
+				//wcscat(querybody, queryvariable);
+				//wcscat(querybody, querysuffix);
+				//ret = Do_SQL_Query(querybody);
+
+
+
 			}
 	}
+
+
+	myFile.close();
 
 	//printf("timer tick %02d\n", i);
 	//i++;
