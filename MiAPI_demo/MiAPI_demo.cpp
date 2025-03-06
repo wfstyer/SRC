@@ -256,7 +256,8 @@ COMPLETED:
 VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 {
 
-	int ret;
+	int ret{};
+	ret == 0;
 	int statusvariable;
 
 	std::ifstream inFile("C:\GPIO\machinestatus.txt");
