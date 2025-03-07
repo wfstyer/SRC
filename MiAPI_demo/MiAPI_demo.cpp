@@ -42,7 +42,7 @@ using namespace std;
 //int TimeToCrash = 0;        //It set a time to simulate application crash for WDT demo.
 
 int i = 0;
-bool estopmem = false;
+bool estopmem = true;
 //char querytext;
 
 //-- Functions start ----
@@ -294,18 +294,19 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 
 	// ** check estop here **
 
+	cout << "\n" << estopmem << "++\n";
 
 	if (ret != 0)
 	{
 		cout << ret << "Run condition - close EStop relay ****\n";
 		if (estopmem)
 		{
-			ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
-			estopmem = false;
+			// nothing
 		}
 		else
 		{
-			// nothing
+			ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
+			estopmem = true;
 		}
 	}
 	else
@@ -313,17 +314,18 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 		cout << ret << "EStop condition - open EStop relay ****\n";
 		if (estopmem)
 		{
-			// nothing
+			ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
+			estopmem = false;
 		}
 		else
 		{
-			ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
-			estopmem = true;
+			// nothing
 		}
 	}
 
 	// -- check GPIO for input status
 
+	cout << "\n" << estopmem << "++\n";
 
 
 	std::ofstream myFile;
@@ -362,74 +364,76 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 				case 6:
 					if (ret)
 					{
-						//queryvariable = L"Filter_1 = 0"; // if circuit closed then filter is clean
-						statusvariable = 0;
+						//queryvariable = L"Filter_1 = 1"; // if circuit closed then filter is clean
+						estopmem = true;
+						statusvariable = 1;
 						break;
 					}
 					else
 					{
-						//queryvariable = L"Filter_1 = 1"; // if circuit open then filter is dirty
+						//queryvariable = L"Filter_1 = 0"; // if circuit open then filter is dirty
 						if (estopmem)
-						{
-							// nothing
-						}
-						else
 						{
 							ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
-							estopmem = true;
-						}
-						statusvariable = 1;
-						break;
-					}
-				case 7:
-					if (ret)
-					{
-						//queryvariable = L"Filter_2 = 0"; // if circuit closed then filter is clean
-						statusvariable = 0;
-						break;
-					}
-					else
-					{
-						//queryvariable = L"Filter_2 = 1"; // if circuit open then filter is dirty
-						if (estopmem)
-						{
-							// nothing
-						}
-						else
-						{
-							ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
-							estopmem = true;
-						}
-						statusvariable = 1;
-						break;
-					}
-				case 8:
-					if (ret)
-					{
-						//queryvariable = L"EStop = 0"; // if EStop circuit high then not EStop
-						if (estopmem)
-						{
-							ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
 							estopmem = false;
 						}
 						else
 						{
 							// nothing
 						}
+						statusvariable = 0;
+						break;
+					}
+				case 7:
+					if (ret)
+					{
+						//queryvariable = L"Filter_2 = 1"; // if circuit closed then filter is clean
+						estopmem = true;
 						statusvariable = 1;
 						break;
 					}
 					else
 					{
-						//queryvariable = L"EStop = 1"; // if EStop circuit low then EStop
+						//queryvariable = L"Filter_2 = 0"; // if circuit open then filter is dirty
+						if (estopmem)
+						{
+							ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
+							estopmem = false;
+						}
+						else
+						{
+							// nothing
+						}
+						statusvariable = 0;
+						break;
+					}
+				case 8:
+					if (ret)
+					{
+						//queryvariable = L"EStop = 1"; // if EStop circuit high then not EStop
 						if (estopmem)
 						{
 							// nothing
 						}
 						else
 						{
-							ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
+							ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
 							estopmem = true;
+						}
+						statusvariable = 1;
+						break;
+					}
+					else
+					{
+						//queryvariable = L"EStop = 0"; // if EStop circuit low then EStop
+						if (estopmem)
+						{
+							ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
+							estopmem = false;
+						}
+						else
+						{
+							// nothing
 						}
 						statusvariable = 0;
 						break;
@@ -440,6 +444,7 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 
 				myFile << statusvariable << "\n";
 				cout << i << "-" << statusvariable << "****\n";
+				cout << "\n" << estopmem << "++\n";
 
 
 
