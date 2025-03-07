@@ -298,14 +298,14 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 
 	if (ret != 0)
 	{
-		cout << ret << "Run condition - close EStop relay ****\n";
+		cout << ret << "Run condition - close EStop relay - pull down to ground ****\n";
 		if (estopmem)
 		{
 			// nothing
 		}
 		else
 		{
-			ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
+			ret = Write_MiAPI_GPIO(1, 0); // close EStop relay - pull down to ground
 			estopmem = true;
 		}
 	}
@@ -314,7 +314,7 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 		cout << ret << "EStop condition - open EStop relay ****\n";
 		if (estopmem)
 		{
-			ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
+			ret = Write_MiAPI_GPIO(1, 1); // open EStop relay
 			estopmem = false;
 		}
 		else
@@ -364,17 +364,33 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 				case 6:
 					if (ret)
 					{
+						//queryvariable = L"Filter_1 = 0"; // if circuit open then filter is dirty
+						if (estopmem)
+						{
+							ret = Write_MiAPI_GPIO(1, 1); // open EStop relay
+							estopmem = false;
+						}
+						else
+						{
+							// nothing
+						}
+						statusvariable = 0;
+						break;
+					}
+					else
+					{
 						//queryvariable = L"Filter_1 = 1"; // if circuit closed then filter is clean
 						estopmem = true;
 						statusvariable = 1;
 						break;
 					}
-					else
+				case 7:
+					if (ret)
 					{
 						//queryvariable = L"Filter_1 = 0"; // if circuit open then filter is dirty
 						if (estopmem)
 						{
-							ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
+							ret = Write_MiAPI_GPIO(1, 1); // open EStop relay
 							estopmem = false;
 						}
 						else
@@ -382,29 +398,13 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 							// nothing
 						}
 						statusvariable = 0;
-						break;
-					}
-				case 7:
-					if (ret)
-					{
-						//queryvariable = L"Filter_2 = 1"; // if circuit closed then filter is clean
-						estopmem = true;
-						statusvariable = 1;
 						break;
 					}
 					else
 					{
-						//queryvariable = L"Filter_2 = 0"; // if circuit open then filter is dirty
-						if (estopmem)
-						{
-							ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
-							estopmem = false;
-						}
-						else
-						{
-							// nothing
-						}
-						statusvariable = 0;
+						//queryvariable = L"Filter_1 = 1"; // if circuit closed then filter is clean
+						estopmem = true;
+						statusvariable = 1;
 						break;
 					}
 				case 8:
@@ -417,7 +417,7 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 						}
 						else
 						{
-							ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
+							ret = Write_MiAPI_GPIO(1, 0); // close EStop relay - pull down to ground - pull down to ground
 							estopmem = true;
 						}
 						statusvariable = 1;
@@ -428,7 +428,7 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 						//queryvariable = L"EStop = 0"; // if EStop circuit low then EStop
 						if (estopmem)
 						{
-							ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
+							ret = Write_MiAPI_GPIO(1, 1); // open EStop relay
 							estopmem = false;
 						}
 						else
