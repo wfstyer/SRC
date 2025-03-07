@@ -410,21 +410,6 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 				case 8:
 					if (ret)
 					{
-						//queryvariable = L"EStop = 1"; // if EStop circuit high then not EStop
-						if (estopmem)
-						{
-							// nothing
-						}
-						else
-						{
-							ret = Write_MiAPI_GPIO(1, 0); // close EStop relay - pull down to ground - pull down to ground
-							estopmem = true;
-						}
-						statusvariable = 1;
-						break;
-					}
-					else
-					{
 						//queryvariable = L"EStop = 0"; // if EStop circuit low then EStop
 						if (estopmem)
 						{
@@ -436,6 +421,21 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 							// nothing
 						}
 						statusvariable = 0;
+						break;
+					}
+					else
+					{
+						//queryvariable = L"EStop = 1"; // if EStop circuit high then not EStop
+						if (estopmem)
+						{
+							// nothing
+						}
+						else
+						{
+							ret = Write_MiAPI_GPIO(1, 0); // close EStop relay - pull down to ground - pull down to ground
+							estopmem = true;
+						}
+						statusvariable = 1;
 						break;
 					}
 				default:
