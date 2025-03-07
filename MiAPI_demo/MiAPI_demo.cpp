@@ -296,13 +296,13 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 
 	if (ret != 0)
 	{
-		cout << ret << "EStop condition - open EStop relay ****\n";
-		ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
+		cout << ret << "Run condition - close EStop relay ****\n";
+		ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
 	}
 	else
 	{
-		cout << ret << "Run condition - close EStop relay ****\n";
-		ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
+		cout << ret << "EStop condition - open EStop relay ****\n";
+		ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
 	}
 
 	// -- check GPIO for input status
@@ -375,14 +375,14 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 					{
 						//queryvariable = L"EStop = 0"; // if EStop circuit high then not EStop
 						ret = Write_MiAPI_GPIO(1, 1); // close EStop relay
-						statusvariable = 0;
+						statusvariable = 1;
 						break;
 					}
 					else
 					{
 						//queryvariable = L"EStop = 1"; // if EStop circuit low then EStop
 						ret = Write_MiAPI_GPIO(1, 0); // open EStop relay
-						statusvariable = 1;
+						statusvariable = 0;
 						break;
 					}
 				default:
