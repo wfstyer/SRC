@@ -267,13 +267,13 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 	if (inFile.is_open())
 	{
 		std::getline(inFile, line);
-		std::cout << line << "\n";
+		std::cout << line << " file input\n";
 		std::getline(inFile, line);
-		std::cout << line << "\n";
+		std::cout << line << " file input\n";
 		std::getline(inFile, line);
-		std::cout << line << "\n";
+		std::cout << line << " file input\n";
 		std::getline(inFile, line);
-		std::cout << line << "\n";
+		std::cout << line << " file input\n";
 
 		ret = std::stoi(line);
 
@@ -291,7 +291,7 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 	// ** check estop here **
 
 	estopmem = ret;
-	std::cout << "\n" << estopmem << "++\n";
+	std::cout << estopmem << " estop memory\n";
 
 	//if (ret != 0)
 	//{
@@ -299,10 +299,13 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 	if (estopmem)
 	{
 		ret = Write_MiAPI_GPIO(1, 0); // close EStop relay - pull down to ground
+		std::cout << "close EStop relay - pull down to ground\n";
 	}
 	else
 	{
 		ret = Write_MiAPI_GPIO(1, 1); // open EStop relay - go high
+		std::cout << "open EStop relay - go high\n";
+
 	}
 	//}
 	//else
@@ -321,7 +324,7 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 
 	// -- check GPIO for input status
 
-		std::cout << "\n" << estopmem << "++\n";
+		//std::cout << "\n" << estopmem << "++\n";
 
 
 	std::ofstream myFile;
@@ -391,14 +394,14 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 					if (ret)
 					{
 						//queryvariable = L"EStop = 1"; // if EStop circuit high then not EStop
-						estopmem = false;
+						estopmem = true;
 						statusvariable = 1;
 						break;
 					}
 					else
 					{
 						//queryvariable = L"EStop = 0"; // if EStop circuit low then EStop
-						estopmem = true;
+						estopmem = false;
 						statusvariable = 0;
 						break;
 					}
@@ -407,18 +410,13 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 				}
 
 				myFile << statusvariable << "\n";
-				std::cout << i << "-" << statusvariable << "****\n";
-				std::cout << "\n" << estopmem << "++\n";
-
-
+				std::cout << i << " - " << statusvariable << " GPIO input status\n";
+				std::cout << estopmem << " estop memory\n";
 
 				// - comment out SQL query for the moment
 				//wcscat(querybody, queryvariable);
 				//wcscat(querybody, querysuffix);
 				//ret = Do_SQL_Query(querybody);
-
-
-
 			}
 	}
 
