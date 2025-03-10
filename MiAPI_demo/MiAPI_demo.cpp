@@ -387,27 +387,19 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 						statusvariable = 1;
 						break;
 					}
-				case 8:		// ------------ somthing going sideways here ---- filter alarms work properly - but not estop? -----------
+				case 8:
 					if (ret)
 					{
-						//queryvariable = L"EStop = 0"; // if EStop circuit low then EStop
-						estopmem = true;
-						statusvariable = 0;
+						//queryvariable = L"EStop = 1"; // if EStop circuit high then not EStop
+						estopmem = false;
+						statusvariable = 1;
 						break;
 					}
 					else
 					{
-						//queryvariable = L"EStop = 1"; // if EStop circuit high then not EStop
-						//if (estopmem)
-						//{
-						//	// nothing
-						//}
-						//else
-						//{
-						//ret = Write_MiAPI_GPIO(1, 0); // close EStop relay - pull down to ground - pull down to ground
-						estopmem = false;
-						//}
-						statusvariable = 1;
+						//queryvariable = L"EStop = 0"; // if EStop circuit low then EStop
+						estopmem = true;
+						statusvariable = 0;
 						break;
 					}
 				default:
