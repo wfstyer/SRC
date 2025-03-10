@@ -288,14 +288,9 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 	//wchar_t checkEStop[1024] = L"SELECT EStop FROM TestStandX1 WHERE ID = 1";
 	//ret = Do_SQL_Query(checkEStop);
 
-	// ** check estop here **
-
 	estopmem = ret;
 	std::cout << estopmem << " estop memory\n";
 
-	//if (ret != 0)
-	//{
-	//	cout << ret << "Run condition - close EStop relay - pull down to ground ****\n";
 	if (estopmem)
 	{
 		ret = Write_MiAPI_GPIO(1, 0); // close EStop relay - pull down to ground
@@ -307,37 +302,15 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 		std::cout << "open EStop relay - go high\n";
 
 	}
-	//}
-	//else
-	//{
-	//	cout << ret << "EStop condition - open EStop relay - go high ****\n";
-	//	if (estopmem)
-	//	{
-	//		ret = Write_MiAPI_GPIO(1, 1); // open EStop relay - go high
-	//		estopmem = true;
-	//	}
-	//	else
-	//	{
-	//		// nothing
-	//	}
-	//}
 
 	// -- check GPIO for input status
-
-		//std::cout << "\n" << estopmem << "++\n";
-
 
 	std::ofstream myFile;
 	myFile.open("machinestatus.txt");
 
-
-
-
 	//wchar_t querybody[1024] = L"UPDATE TestStandX1 SET ";
 	//wchar_t* queryvariable;
 	//wchar_t* querysuffix = L" WHERE ID = 1";
-
-
 
 	for (int i = 5; i <= 8; i++)
 	{
@@ -393,16 +366,16 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 				case 8:
 					if (ret)
 					{
-						//queryvariable = L"EStop = 1"; // if EStop circuit high then not EStop
+						//queryvariable = L"EStop = 0"; // if EStop circuit low then EStop
 						estopmem = true;
-						statusvariable = 1;
+						statusvariable = 0;
 						break;
 					}
 					else
 					{
-						//queryvariable = L"EStop = 0"; // if EStop circuit low then EStop
+						//queryvariable = L"EStop = 1"; // if EStop circuit high then not EStop
 						estopmem = false;
-						statusvariable = 0;
+						statusvariable = 1;
 						break;
 					}
 				default:
