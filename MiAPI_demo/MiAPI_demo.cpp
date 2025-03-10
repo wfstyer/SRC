@@ -293,14 +293,13 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 
 	if (estopmem)
 	{
-		ret = Write_MiAPI_GPIO(1, 0); // close EStop relay - pull down to ground
-		std::cout << "close EStop relay - pull down to ground\n";
+		ret = Write_MiAPI_GPIO(1, 1); // close EStop relay - go high
+		std::cout << "close EStop relay - go high\n";
 	}
 	else
 	{
-		ret = Write_MiAPI_GPIO(1, 1); // open EStop relay - go high
-		std::cout << "open EStop relay - go high\n";
-
+		ret = Write_MiAPI_GPIO(1, 0); // open EStop relay - pull down to ground
+		std::cout << "open EStop relay - pull down to ground\n";
 	}
 
 	// -- check GPIO for input status
@@ -337,8 +336,8 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 					if (ret)
 					{
 						//queryvariable = L"Filter_1 = 0"; // if circuit open then filter is dirty
-						ret = Write_MiAPI_GPIO(1, 1); // open EStop relay - go high
-						estopmem = true;
+						ret = Write_MiAPI_GPIO(1, 0); // open EStop relay - pull down to ground
+						estopmem = false;
 						statusvariable = 0;
 						break;
 					}
@@ -352,8 +351,8 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 					if (ret)
 					{
 						//queryvariable = L"Filter_2 = 0"; // if circuit open then filter is dirty
-						ret = Write_MiAPI_GPIO(1, 1); // open EStop relay - go high
-						estopmem = true;
+						ret = Write_MiAPI_GPIO(1, 0); // open EStop relay - pull down to ground
+						estopmem = false;
 						statusvariable = 0;
 						break;
 					}
@@ -367,14 +366,14 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 					if (ret)
 					{
 						//queryvariable = L"EStop = 0"; // if EStop circuit low then EStop
-						estopmem = true;
+						estopmem = false;
 						statusvariable = 0;
 						break;
 					}
 					else
 					{
 						//queryvariable = L"EStop = 1"; // if EStop circuit high then not EStop
-						estopmem = false;
+						estopmem = true;
 						statusvariable = 1;
 						break;
 					}
