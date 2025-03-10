@@ -191,36 +191,36 @@ int Do_SQL_Query(PWCHAR ptrsqlquerytext)
 		printf("\n");
 		break;
 	case SQL_SUCCESS_WITH_INFO:
-		cout << "Successfully connected to SQL Server";
-		cout << "\n";
+		printf("Successfully connected to SQL Server");
+		printf("\n");
 		break;
 	case SQL_INVALID_HANDLE:
-		cout << "Could not connect to SQL Server";
-		cout << "\n";
+		printf("Could not connect to SQL Server");
+		printf("\n");
 		goto COMPLETED;
 	case SQL_ERROR:
-		cout << "Could not connect to SQL Server";
-		cout << "\n";
+		printf("Could not connect to SQL Server");
+		printf("\n");
 		goto COMPLETED;
 	default:
 		break;
 	}
 
 	if (SQL_SUCCESS != SQLAllocHandle(SQL_HANDLE_STMT, sqlConnHandle, &sqlStmtHandle)) {
-		cout << "\nSome kind of problem....\n";
+		printf("\nSome kind of problem....\n");
 		goto COMPLETED;
 	}
 	else {
 
 		//output
-		cout << "\n";
-		cout << "Executing T-SQL query...";
-		cout << "\n";
+		printf("\n");
+		printf("Executing T-SQL query...");
+		printf("\n");
 		//if there is a problem executing the query then exit application
 		//else display query result
 		if (SQL_SUCCESS != SQLExecDirect(sqlStmtHandle, ptrsqlquerytext, SQL_NTS)) {
-			cout << "Error querying SQL Server";
-			cout << "\n";
+			printf("Error querying SQL Server");
+			printf("\n");
 			goto COMPLETED;
 		}
 
@@ -230,8 +230,8 @@ int Do_SQL_Query(PWCHAR ptrsqlquerytext)
 		while (SQLFetch(sqlStmtHandle) == SQL_SUCCESS) {
 			SQLGetData(sqlStmtHandle, 1, SQL_CHAR, sqlcelltext, SQL_RESULT_LEN, &ptrsqlcelltext);
 			//display query result
-			cout << "\nQuery Result: ";
-			cout << sqlcelltext << endl;
+			printf("\nQuery Result: ");
+			std::cout <<sqlcelltext << endl;
 			ret = std::stoi(reinterpret_cast<const char*>(sqlcelltext));
 		}
 	}
@@ -267,13 +267,13 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 	if (inFile.is_open())
 	{
 		std::getline(inFile, line);
-		cout << line << "\n";
+		std::cout << line << "\n";
 		std::getline(inFile, line);
-		cout << line << "\n";
+		std::cout << line << "\n";
 		std::getline(inFile, line);
-		cout << line << "\n";
+		std::cout << line << "\n";
 		std::getline(inFile, line);
-		cout << line << "\n\n";
+		std::cout << line << "\n";
 
 		ret = std::stoi(line);
 
@@ -290,38 +290,38 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 
 	// ** check estop here **
 
-	cout << "\n" << estopmem << "++\n";
+	estopmem = ret;
+	std::cout << "\n" << estopmem << "++\n";
 
-	if (ret != 0)
+	//if (ret != 0)
+	//{
+	//	cout << ret << "Run condition - close EStop relay - pull down to ground ****\n";
+	if (estopmem)
 	{
-		cout << ret << "Run condition - close EStop relay - pull down to ground ****\n";
-		if (estopmem)
-		{
-			// nothing
-		}
-		else
-		{
-			ret = Write_MiAPI_GPIO(1, 0); // close EStop relay - pull down to ground
-			estopmem = false;
-		}
+		ret = Write_MiAPI_GPIO(1, 0); // close EStop relay - pull down to ground
 	}
 	else
 	{
-		cout << ret << "EStop condition - open EStop relay - go high ****\n";
-		if (estopmem)
-		{
-			ret = Write_MiAPI_GPIO(1, 1); // open EStop relay - go high
-			estopmem = true;
-		}
-		else
-		{
-			// nothing
-		}
+		ret = Write_MiAPI_GPIO(1, 1); // open EStop relay - go high
 	}
+	//}
+	//else
+	//{
+	//	cout << ret << "EStop condition - open EStop relay - go high ****\n";
+	//	if (estopmem)
+	//	{
+	//		ret = Write_MiAPI_GPIO(1, 1); // open EStop relay - go high
+	//		estopmem = true;
+	//	}
+	//	else
+	//	{
+	//		// nothing
+	//	}
+	//}
 
 	// -- check GPIO for input status
 
-	cout << "\n" << estopmem << "++\n";
+		std::cout << "\n" << estopmem << "++\n";
 
 
 	std::ofstream myFile;
@@ -361,45 +361,29 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 					if (ret)
 					{
 						//queryvariable = L"Filter_1 = 0"; // if circuit open then filter is dirty
-						if (estopmem)
-						{
-							ret = Write_MiAPI_GPIO(1, 1); // open EStop relay - go high
-							estopmem = true;
-						}
-						else
-						{
-							// nothing
-						}
+						ret = Write_MiAPI_GPIO(1, 1); // open EStop relay - go high
+						estopmem = true;
 						statusvariable = 0;
 						break;
 					}
 					else
 					{
 						//queryvariable = L"Filter_1 = 1"; // if circuit closed then filter is clean
-						//estopmem = true;
 						statusvariable = 1;
 						break;
 					}
 				case 7:
 					if (ret)
 					{
-						//queryvariable = L"Filter_1 = 0"; // if circuit open then filter is dirty
-						if (estopmem)
-						{
-							ret = Write_MiAPI_GPIO(1, 1); // open EStop relay - go high
-							estopmem = true;
-						}
-						else
-						{
-							// nothing
-						}
+						//queryvariable = L"Filter_2 = 0"; // if circuit open then filter is dirty
+						ret = Write_MiAPI_GPIO(1, 1); // open EStop relay - go high
+						estopmem = true;
 						statusvariable = 0;
 						break;
 					}
 					else
 					{
-						//queryvariable = L"Filter_1 = 1"; // if circuit closed then filter is clean
-						//estopmem = true;
+						//queryvariable = L"Filter_2 = 1"; // if circuit closed then filter is clean
 						statusvariable = 1;
 						break;
 					}
@@ -407,30 +391,22 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 					if (ret)
 					{
 						//queryvariable = L"EStop = 0"; // if EStop circuit low then EStop
-						if (estopmem)
-						{
-							ret = Write_MiAPI_GPIO(1, 1); // open EStop relay - go high
-							estopmem = true;
-						}
-						else
-						{
-							// nothing
-						}
+						estopmem = true;
 						statusvariable = 0;
 						break;
 					}
 					else
 					{
 						//queryvariable = L"EStop = 1"; // if EStop circuit high then not EStop
-						if (estopmem)
-						{
-							// nothing
-						}
-						else
-						{
-							ret = Write_MiAPI_GPIO(1, 0); // close EStop relay - pull down to ground - pull down to ground
-							estopmem = false;
-						}
+						//if (estopmem)
+						//{
+						//	// nothing
+						//}
+						//else
+						//{
+						//ret = Write_MiAPI_GPIO(1, 0); // close EStop relay - pull down to ground - pull down to ground
+						estopmem = false;
+						//}
 						statusvariable = 1;
 						break;
 					}
@@ -439,8 +415,8 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 				}
 
 				myFile << statusvariable << "\n";
-				cout << i << "-" << statusvariable << "****\n";
-				cout << "\n" << estopmem << "++\n";
+				std::cout << i << "-" << statusvariable << "****\n";
+				std::cout << "\n" << estopmem << "++\n";
 
 
 
@@ -454,7 +430,7 @@ VOID CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
 			}
 	}
 
-	cout << "\n";
+	std::cout << "\n";
 	myFile.close();
 
 	//printf("timer tick %02d\n", i);
