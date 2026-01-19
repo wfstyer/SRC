@@ -7,6 +7,9 @@
 // MiAPI_demo.cpp : This the console application will demonstrate MiAPI 5 major
 // features : GPIO, Hardware monitoring, Display Control, SMBUS, Watchdog. 
 
+// Last save before deleting SQL and adding MTC agent
+
+
 #include "stdafx.h"
 #include <Windows.h>
 #include <process.h>
